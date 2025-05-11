@@ -1,12 +1,11 @@
-import { Controller, Get } from '@nestjs/common';
-import { AppService } from './app.service';
+// src/app.controller.ts
+import { Controller, Get, Res } from '@nestjs/common';
+import { Response } from 'express';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
-
   @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  renderHome(@Res() res: Response) {
+    res.render('home', { title: 'Welcome to the NestJS Portal' });
   }
 }
