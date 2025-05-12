@@ -13,7 +13,6 @@ export class AuthController {
   @Post('redirect')
   @UseGuards(AuthGuard('azuread-openidconnect'))
   redirect(@Req() req: Request, @Res() res: Response) {
-    // Handles ID token callback and session setup
     res.redirect('/');
   }
 

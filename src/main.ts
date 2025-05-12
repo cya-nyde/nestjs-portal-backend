@@ -22,7 +22,6 @@ async function bootstrap() {
   app.use(passport.initialize());
   app.use(passport.session());
 
-  // Serialize and deserialize user for session support
   passport.serializeUser((user: Express.User, done) => {
     done(null, user);
   });

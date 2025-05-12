@@ -1,5 +1,6 @@
-import { Controller, Get, Req, Res } from '@nestjs/common';
+import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
 import { Request, Response } from 'express';
+import { AuthenticatedGuard } from './auth/authenticated.guard';
 
 @Controller()
 export class AppController {
@@ -7,6 +8,15 @@ export class AppController {
   renderHome(@Req() req: Request, @Res() res: Response) {
     res.render('home', {
       title: 'NestJS Internal Portal',
+      user: req.user,
+    });
+  }
+
+  @Get('dashboard')
+  @UseGuards(AuthenticatedGuard)
+  renderDashboard(@Req() req: Request, @Res() res: Response) {
+    res.render('dashboard', {
+      title: 'Dashboard',
       user: req.user,
     });
   }
