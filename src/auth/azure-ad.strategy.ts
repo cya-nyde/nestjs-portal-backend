@@ -1,3 +1,4 @@
+// src/auth/azure-ad.strategy.ts
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { OIDCStrategy, IOIDCStrategyOptionWithReq } from 'passport-azure-ad';
@@ -13,11 +14,15 @@ export class AzureAdStrategy extends PassportStrategy(
       identityMetadata: `https://login.microsoftonline.com/${process.env.AZURE_TENANT_ID}/v2.0/.well-known/openid-configuration`,
       clientID: process.env.AZURE_CLIENT_ID,
       clientSecret: process.env.AZURE_CLIENT_SECRET,
-      responseType: 'code id_token',
+
+      // <-- Switch to code-only flow
+      responseType: 'code',
       responseMode: 'form_post',
-      redirectUrl: process.env.AZURE_REDIRECT_URI || 'http://localhost:3000/auth/redirect',
+
+      redirectUrl: process.env.AZURE_REDIRECT_URI,
+
       allowHttpForRedirectUrl: true,
-      scope: ['openid', 'profile', 'email', 'offline_access'],
+      scope: ['openid', 'profile', 'email'],  // add 'offline_access' if you need refresh tokens
       loggingLevel: 'info',
       passReqToCallback: false,
     } as IOIDCStrategyOptionWithReq);

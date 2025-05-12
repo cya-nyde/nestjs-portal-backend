@@ -1,7 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import * as passport from 'passport';
 import * as session from 'express-session';
 import * as dotenv from 'dotenv';
 import { join } from 'path';
@@ -18,16 +17,6 @@ async function bootstrap() {
       saveUninitialized: false,
     }),
   );
-
-  app.use(passport.initialize());
-  app.use(passport.session());
-
-  passport.serializeUser((user: Express.User, done) => {
-    done(null, user);
-  });
-  passport.deserializeUser((user: Express.User, done) => {
-    done(null, user);
-  });
 
   app.useStaticAssets(join(__dirname, '..', 'public'));
   app.setBaseViewsDir(join(__dirname, '..', 'views'));
