@@ -13,7 +13,7 @@ async function bootstrap() {
 
   app.use(
     session({
-      secret: process.env.SESSION_SECRET || 'your-default-secret',
+      secret: process.env.SESSION_SECRET || 'default-secret',
       resave: false,
       saveUninitialized: false,
     }),
@@ -22,11 +22,18 @@ async function bootstrap() {
   app.use(passport.initialize());
   app.use(passport.session());
 
+  // Serialize and deserialize user for session support
+  passport.serializeUser((user: Express.User, done) => {
+    done(null, user);
+  });
+  passport.deserializeUser((user: Express.User, done) => {
+    done(null, user);
+  });
+
   app.useStaticAssets(join(__dirname, '..', 'public'));
   app.setBaseViewsDir(join(__dirname, '..', 'views'));
   app.setViewEngine('ejs');
 
   await app.listen(process.env.PORT || 3000);
 }
-
 bootstrap();
