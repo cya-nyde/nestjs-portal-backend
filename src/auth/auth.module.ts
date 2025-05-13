@@ -1,12 +1,10 @@
 import { Module } from '@nestjs/common';
-import { PassportModule } from '@nestjs/passport';
-import { AzureAdStrategy } from './azure-ad.strategy';
 import { AuthController } from './auth.controller';
+import { MsalService } from './msal.service';
 import { AuthenticatedGuard } from './authenticated.guard';
 
 @Module({
-  imports: [PassportModule.register({ session: true })],
-  providers: [AzureAdStrategy, AuthenticatedGuard],
+  providers: [MsalService, AuthenticatedGuard],
   controllers: [AuthController],
 })
 export class AuthModule {}

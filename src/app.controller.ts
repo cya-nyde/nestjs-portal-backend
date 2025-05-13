@@ -8,7 +8,7 @@ export class AppController {
   renderHome(@Req() req: Request, @Res() res: Response) {
     res.render('home', {
       title: 'NestJS Internal Portal',
-      user: req.user,
+      user: req.session.user,
     });
   }
 
@@ -17,7 +17,7 @@ export class AppController {
   renderDashboard(@Req() req: Request, @Res() res: Response) {
     res.render('dashboard', {
       title: 'Dashboard',
-      user: req.user,
+      user: req.session.user,
     });
   }
 }
