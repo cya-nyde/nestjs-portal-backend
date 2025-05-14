@@ -10,30 +10,51 @@ export class AuthController {
 
   @Get('login')
   async login(@Req() req: Request, @Res() res: Response) {
-    const verifier = randomBytes(32).toString('hex');
-    const challenge = this.base64URLEncode(
-      createHash('sha256').update(verifier).digest(),
-    );
-    req.session.codeVerifier = verifier;
-    const authCodeUrl = await this.msalService.getAuthCodeUrl(challenge);
-    res.redirect(authCodeUrl);
+    try {
+      const verifier = randomBytes(32).toString('hex');
+      const challenge = this.base64URLEncode(
+        createHash('sha256').update(verifier).digest(),
+      );
+      req.session.codeVerifier = verifier;
+      const authCodeUrl = await this.msalService.getAuthCodeUrl(challenge);
+      return res.redirect(authCodeUrl);
+    } catch (error) {
+      console.error('Error generating auth code URL', error);
+      return res.status(500).send('Error initiating login. Check server logs.');
+    }
   }
 
   @Get('redirect')
   async redirect(@Req() req: Request, @Res() res: Response) {
-    const code = req.query.code as string;
-    const tokenResponse = await this.msalService.acquireToken(
-      code,
-      req.session.codeVerifier,
-    );
-    req.session.user = tokenResponse.account;
-    res.redirect('/');
+    try {
+      const code = req.query.code as string;
+      const codeVerifier = req.session.codeVerifier;
+      if (!codeVerifier) {
+        return res.status(400).send('Invalid request: missing code verifier');
+      }
+      const tokenResponse = await this.msalService.acquireToken(
+        code,
+        codeVerifier,
+      );
+      const account = tokenResponse.account;
+      if (!account) {
+        return res.status(401).send('Authentication failed: no account info');
+      }
+      req.session.user = account;
+      return res.redirect('/');
+    } catch (error) {
+      console.error('Error handling redirect:', error);
+      return res.status(500).send('Error completing login. Check server logs.');
+    }
   }
 
   @Get('logout')
   @UseGuards(AuthenticatedGuard)
   logout(@Req() req: Request, @Res() res: Response) {
-    req.session.destroy(() => res.redirect('/'));
+    req.session.destroy(err => {
+      if (err) console.error('Error destroying session', err);
+      res.redirect('/');
+    });
   }
 
   private base64URLEncode(buffer: Buffer) {
